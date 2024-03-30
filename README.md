@@ -1,2 +1,3 @@
 # LASP
-LASP: Linear Attention Sequence Parallelism
+
+Implementation of Linear Attention Sequence Parallelism (LASP).
