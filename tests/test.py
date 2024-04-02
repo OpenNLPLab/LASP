@@ -62,19 +62,20 @@ def split_data(x):
 
 def test(dp_size):
     """
-    Assume we have 1 node with 8 GPUs and the ranks are {0, 1, 2, 3, 4, 5, 6, 7}.
-    Then for data parallel size = 2 and sequence parallel size = 4, the parallel groups are
-    4 data_parallel groups:
-        (0, 4), (1, 5), (2, 6), (3, 7)
-    2 sequence paralell groups:
-        (0, 1, 2, 3), (4, 5, 6, 7)
-    In summary, the group maping is as follows:
-    Global rank:             0, 1, 2, 3, 4, 5, 6, 7
-    Data parallel rank:      0, 0, 0, 0, 1, 1, 1, 1
-    Sequence parallel rank:  0, 1, 2, 3, 0, 1, 2, 3
+    As an example, assume we have 1 node with 8 GPUs and the ranks are {0, 1, 2, 3, 4, 5, 6, 7}. For data parallel size = 2 and sequence parallel size = 4, the DP and SP communication groups will be:
 
-    In the following example, we initialize data loading on global rank 0, then broadcast data chunks to other ranks.
-    Each GPU gets their own data chunk according to the data parallel rank and sequence parallel rank.
+    4 data_parallel groups (with global rank indices):
+    (0, 4), (1, 5), (2, 6), (3, 7)
+
+    2 sequence paralell groups (with global rank indices):
+    (0, 1, 2, 3), (4, 5, 6, 7)
+
+    In summary, the group maping (with their own rank indices) is as follows:
+    Global ranks:             0, 1, 2, 3, 4, 5, 6, 7
+    Data parallel ranks:      0, 0, 0, 0, 1, 1, 1, 1
+    Sequence parallel ranks:  0, 1, 2, 3, 0, 1, 2, 3
+
+    In the following example, we initialize data loading on global rank 0, then broadcast data chunks to other ranks. Each GPU gets their own data chunk according to the data parallel rank and sequence parallel rank.
     """
     dist.init_process_group("nccl")
     rank = dist.get_rank()
