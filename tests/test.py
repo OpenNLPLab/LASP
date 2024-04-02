@@ -64,19 +64,19 @@ def split_data(x):
 
 def test(dp_size):
     """
-    Assume we have 8 gpus and the rank is 0, 1, 2, 3, 4, 5, 6, 7.
-    Then for data parallel size = 2 and sequence parallel size = 8, the parallel groups are
-    2 data_parallel groups:
-        (0, 2, 4, 6), (1, 3, 5, 7)
-    4 sequence paralell groups:
-        (0, 1), (2, 3), (4, 5), (7, 8)
+    Assume we have 1 node with 8 GPUs and the ranks are {0, 1, 2, 3, 4, 5, 6, 7}.
+    Then for data parallel size = 2 and sequence parallel size = 4, the parallel groups are
+    4 data_parallel groups:
+        (0, 4), (1, 5), (2, 6), (3, 7)
+    2 sequence paralell groups:
+        (0, 1, 2, 3), (4, 5, 6, 7)
     In summary, the group maping is as follows:
     Global rank:             0, 1, 2, 3, 4, 5, 6, 7
-    Data parallel rank:      0, 0, 1, 1, 2, 2, 3, 3
+    Data parallel rank:      0, 0, 0, 0, 1, 1, 1, 1
     Sequence parallel rank:  0, 1, 2, 3, 0, 1, 2, 3
 
-    For the following example, we initialize data on global rank 0, then broadcast to other ranks.
-    Each gpu get their own data according to data parallel rank and sequence parallel rank.
+    In the following example, we initialize data loading on global rank 0, then broadcast data chunks to other ranks.
+    Each GPU gets their own data chunk according to the data parallel rank and sequence parallel rank.
     """
     dist.init_process_group("nccl")
     rank = dist.get_rank()
@@ -160,7 +160,7 @@ def test(dp_size):
             DKV = torch.empty(b_local, h, d, e).to(torch.float32).to(q.device)
             oi = f(qi, ki, vi, s, KV, DKV)
 
-        log("out diff", oi_ref - oi)
+        log("out diff", oi_ref - oi, rank0_only=True)
 
         dist.barrier()
         if rank == 0:
@@ -173,11 +173,9 @@ def test(dp_size):
         dki = ki.grad.clone()
         dvi = vi.grad.clone()
 
-        log("dq diff", dq_ref - dqi)
-
-        log("dk diff", dk_ref - dki)
-
-        log("dv diff", dv_ref - dvi)
+        log("dq diff", dq_ref - dqi, rank0_only=True)
+        log("dk diff", dk_ref - dki, rank0_only=True)
+        log("dv diff", dv_ref - dvi, rank0_only=True)
 
 
 if __name__ == "__main__":
@@ -187,8 +185,3 @@ if __name__ == "__main__":
     dp_size = args.dp_size
 
     test(dp_size)
-
-    # for dp_size in [1, 2, 4, 8]:
-    # # for dp_size in [1]:
-    #     test(dp_size)
-    #     # dist.destroy_process_group()
