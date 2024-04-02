@@ -28,8 +28,7 @@ def log(msg, a, rank0_only=False):
         if rank == 0:
             print(
                 f"{msg}: "
-                f"max {a.abs().max().item()}, "
-                f"mean {a.abs().mean().item()}",
+                f"mean value: {a.abs().mean().item()}",
                 flush=True,
             )
         return
@@ -40,8 +39,7 @@ def log(msg, a, rank0_only=False):
                 print(f"{msg}:")
             print(
                 f"[{rank}] "
-                f"max {a.abs().max().item()}, "
-                f"mean {a.abs().mean().item()}",
+                f"mean value: {a.abs().mean().item()}",
                 flush=True,
             )
         dist.barrier()
@@ -137,16 +135,13 @@ def test(dp_size):
 
         f = name_2_fn_dict[name]
         if rank == 0:
-            print("#" * 30)
+            print("\n")
             print(
-                f"# Start test {name} with data parallel size {dp_size} and sequence parallel size {sp_size}"
+                f"Test lasp_{name} on world size {world_size} with data_parallel_size {dp_size} and sequence_parallel_size {sp_size}:"
             )
-            print("#" * 30)
 
         if rank == 0:
-            print("#" * 30)
-            print("# forward:")
-            print("#" * 30)
+            print("### Forward ###")
 
         if name == "naive":
             oi = f(qi, ki, vi, s)
@@ -164,9 +159,7 @@ def test(dp_size):
 
         dist.barrier()
         if rank == 0:
-            print("#" * 30)
-            print("# backward:")
-            print("#" * 30)
+            print("### Backward ###")
 
         oi.backward(doi, retain_graph=True)
         dqi = qi.grad.clone()
