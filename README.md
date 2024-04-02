@@ -141,6 +141,77 @@ dq diff: mean value: 0.0205078125
 dk diff: mean value: 0.025146484375
 dv diff: mean value: 0.03564453125
 
+
+Test lasp_naive on world size 4 with data_parallel_size 2 and sequence_parallel_size 2:
+### Forward ###
+out diff: mean value: 0.0
+### Backward ###
+dq diff: mean value: 0.0169677734375
+dk diff: mean value: 0.04638671875
+dv diff: mean value: 0.0654296875
+
+
+Test lasp_cache on world size 4 with data_parallel_size 2 and sequence_parallel_size 2:
+### Forward ###
+out diff: mean value: 0.0
+### Backward ###
+dq diff: mean value: 0.0169677734375
+dk diff: mean value: 0.04638671875
+dv diff: mean value: 0.0654296875
+
+
+Test lasp_fuse on world size 4 with data_parallel_size 2 and sequence_parallel_size 2:
+### Forward ###
+out diff: mean value: 0.05224609375
+### Backward ###
+dq diff: mean value: 0.0198974609375
+dk diff: mean value: 0.021240234375
+dv diff: mean value: 0.06396484375
+
+
+Test lasp_fuse_parallel on world size 4 with data_parallel_size 2 and sequence_parallel_size 2:
+### Forward ###
+out diff: mean value: 0.0240478515625
+### Backward ###
+dq diff: mean value: 0.022705078125
+dk diff: mean value: 0.0250244140625
+dv diff: mean value: 0.035400390625
+
+
+Test lasp_naive on world size 4 with data_parallel_size 4 and sequence_parallel_size 1:
+### Forward ###
+out diff: mean value: 0.0
+### Backward ###
+dq diff: mean value: 0.0172119140625
+dk diff: mean value: 0.0172119140625
+dv diff: mean value: 0.0244140625
+
+
+Test lasp_cache on world size 4 with data_parallel_size 4 and sequence_parallel_size 1:
+### Forward ###
+out diff: mean value: 0.0
+### Backward ###
+dq diff: mean value: 0.0172119140625
+dk diff: mean value: 0.0172119140625
+dv diff: mean value: 0.0244140625
+
+
+Test lasp_fuse on world size 4 with data_parallel_size 4 and sequence_parallel_size 1:
+### Forward ###
+out diff: mean value: 0.053466796875
+### Backward ###
+dq diff: mean value: 0.0205078125
+dk diff: mean value: 0.0205078125
+dv diff: mean value: 0.06298828125
+
+
+Test lasp_fuse_parallel on world size 4 with data_parallel_size 4 and sequence_parallel_size 1:
+### Forward ###
+out diff: mean value: 0.027099609375
+### Backward ###
+dq diff: mean value: 0.02392578125
+dk diff: mean value: 0.02392578125
+dv diff: mean value: 0.033935546875
 ```
 
 
