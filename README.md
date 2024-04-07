@@ -6,24 +6,24 @@
 💬 <a href="./images/contact_me_qr.png" target="_blank">WeChat</a>
 </p>
 
-This repo provides the implementation of Linear Attention Sequence Parallelism (Paper: https://arxiv.org/abs/).
+This repo provides the implementation of Linear Attention Sequence Parallelism (Paper: https://arxiv.org/abs/2404.02882).
 
-<center>
-    <img style="border-radius: 0.3125em;
-    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
-    src="./images/LASP_fig1.png">
-    <br>
-    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
-    display: inline-block;
-    color: #999;
-    padding: 2px;">Linear Attention Sequence Parallelism (LASP)</div>
-</center>
+## LASP v.s. DeepSpeed-Ulysses and Megatron-SP
 
+<p align="center">
+  <img src="./images/lasp_wps_comp.png" />
+</p>
+
+Note: The sign "$\times$" with a dotted line represents occurring an Out of Memory (OOM). The evaluation utilizes the TNL-1B and 7B models with a batch size of 1 on 64 A100 80GB GPUs. The parallelism size for these three methods is configured to 64.
 
 ## Abstract
 
 Sequence Parallel (SP) serves as a prevalent strategy to handle long sequences that exceed the memory limit of a single GPU. However, existing SP methods do not take advantage of linear attention features, resulting in sub-optimal parallelism efficiency and usability for linear attention-based language models. In this paper, we introduce Linear Attention Sequence Parallel (LASP), an efficient SP method tailored to linear attention-based language models. Specifically, we design an efficient point-to-point communication mechanism to leverage the right-product kernel trick of linear attention, which sharply decreases the communication overhead of SP. We also enhance the practical efficiency of LASP by performing kernel fusion and intermediate state caching, making the implementation of LASP hardware-friendly on GPU clusters. Furthermore, we meticulously ensure the compatibility of sequence-level LASP with all types of batch-level data parallel methods, which is vital for distributed training on large clusters with long sequences and large batches.
 We conduct extensive experiments on two linear attention-based models with varying sequence lengths and GPU cluster sizes. LASP scales sequence length up to 4096K using 128 A100 80G GPUs on 1B models, which is 8$\times$ longer than existing SP methods while being significantly faster.
+
+<p align="center">
+  <img src="./images/LASP_fig1.png" />
+</p>
 
 
 ## Installation
@@ -223,12 +223,10 @@ dv diff: mean value: 0.033935546875
 ## Citation
 If you find our work useful, please cite the following paper:
 ```
-@misc{lasp,
-      title={Linear Attention Sequence Parallelism},
-      author={Weigao Sun and Zhen Qin and Dong Li and Xuyang Shen and Yu Qiao and Yiran Zhong},
-      year={2024},
-      eprint={},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL}
+@article{sun2024linear,
+  title={Linear Attention Sequence Parallelism},
+  author={Sun, Weigao and Qin, Zhen and Li, Dong and Shen, Xuyang and Qiao, Yu and Zhong, Yiran},
+  journal={arXiv preprint arXiv:2404.02882},
+  year={2024}
 }
 ```
