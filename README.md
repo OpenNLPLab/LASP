@@ -1,12 +1,12 @@
 # Linear Attention Sequence Parallelism (LASP)
 
 <p align="center">
-💻 <a href="https://github.com/OpenNLPLab/LASP" target="_blank">GitHub </a> •
-💬 <a href="https://discord.gg/JEU3nTcWKC" target="_blank">Discord</a> •
-💬 <a href="./images/contact_me_qr.png" target="_blank">WeChat</a>
+<a href="https://github.com/OpenNLPLab/LASP" target="_blank">GitHub </a> •
+<a href="https://discord.gg/JEU3nTcWKC" target="_blank">Discord</a> •
+<a href="./images/contact_me_qr.png" target="_blank">WeChat</a>
 </p>
 
-This repo provides the implementation of Linear Attention Sequence Parallelism (Paper: https://arxiv.org/abs/2404.02882).
+Offical implementation of Linear Attention Sequence Parallelism (Paper: https://arxiv.org/abs/2404.02882).
 
 ## LASP v.s. DeepSpeed-Ulysses and Megatron-SP
 
@@ -14,7 +14,7 @@ This repo provides the implementation of Linear Attention Sequence Parallelism (
   <img src="./images/lasp_wps_comp.png" />
 </p>
 
-Note: The sign "$\times$" with a dotted line represents occurring an Out of Memory (OOM). The evaluation utilizes the TNL-1B and 7B models with a batch size of 1 on 64 A100 80GB GPUs. The parallelism size for these three methods is configured to 64.
+Note: The sign "x" with a dotted line represents occurring an Out of Memory (OOM). The evaluation utilizes the TNL-1B and 7B models with a batch size of 1 on 64 A100 80GB GPUs. The parallelism size for these three methods is configured to 64.
 
 ## Abstract
 
@@ -51,7 +51,7 @@ The code is organized as follows:
 - `lasp/` contains the implementation of lasp and its improved variants, including `lasp_native`, `lasp_cache`, `lasp_fuse`, `lasp_fuse_parallel` and the non-sequence parallel version: `lightning_attention`.
 - `lasp/utils/` contains the communication manager for lasp, i.e., `seq_parallel_manager`, and other utils functions.
 
-## Usage
+## Code Usage
 The provided code supports the hybrid of Data Parallel (DP) (batch-level) and Sequence Parallel (SP) (sequence-level) on linear attention.
 As an example, assume we have 1 node with 8 GPUs and the ranks are {0, 1, 2, 3, 4, 5, 6, 7}.
 For data parallel size = 2 and sequence parallel size = 4, the DP and SP communication groups will be:
@@ -89,6 +89,36 @@ Other configuratures used in the test is batch size per device `b=2`, sequence l
 By running the test, you will get the mean difference values of `Oi`, `dQi`, `dKi` and `dVi` obtained by LASP, comparing with the reference values of Lightning Attention (see our lightning attention work at: https://github.com/OpenNLPLab/lightning-attention).
 
 ## Benchmark
+
+### Convergence Results
+
+| Model | Parameters | Method       | Loss   | Method| Loss |
+|-|-|-|-|-|-|
+| TNL | 0.4B   | DDP           | 3.719  | LASP + DDP           | 3.715   |
+| TNL | 0.4B   | Legacy DDP | 3.709  |  LASP + Legacy DDP | 3.705   |
+| TNL | 0.4B   | FSDP          | 3.717  |  LASP + FSDP        | 3.714   |
+| TNL | 0.4B   | ZeRO-1         | 3.653  | LASP + ZeRO-1       | 3.653   |
+| TNL | 0.4B   | ZeRO-2         | 3.655  | LASP + ZeRO-2       | 3.649  |
+| TNL | 0.4B   | ZeRO-3         | 3.656  | LASP + ZeRO-3        | 3.649 |
+| LinearTransformer | 0.4B  |  DDP     | 5.419  | LASP + DDP     | 5.408   |
+| LinearTransformer | 0.4B  | Legacy DDP      | 5.425  | LASP + Legacy DDP     | 5.413  |
+| LinearTransformer | 0.4B  | FSDP          | 5.428  |  LASP + FSDP        | 5.441   |
+| LinearTransformer | 0.4B  | ZeRO-1         | 5.114  | LASP + ZeRO-1        | 5.118    |
+| LinearTransformer | 0.4B  | ZeRO-2         | 5.105  | LASP + ZeRO-2        | 5.120   |
+| LinearTransformer | 0.4B  | ZeRO-3         | 5.110  | LASP + ZeRO-3        | 5.123   |
+
+*Convergence Performance of LASP. All experiments use 8 A100 80G GPUs, 16K sequence length, and batch size of 1. The results cover various DDP backends in conjunction with LASP. We explore the performance of two linear attention models: TransNormerLLM (TNL) and Linear Transformer, both with 0.4B parameters, across 50K updates.
+
+### Scalability Results
+
+<p align="center">
+  <img src="./images/lasp_sca_wps.png" />
+  <img src="./images/lasp_sca_memory.png" />
+  <img src="./images/lasp_sca_wps_ddp.png" />
+  <img src="./images/lasp_sca_memory_ddp.png" />
+</p>
+
+*Scalability Evaluation of LASP on Throughput (tokens/sec) and Memory Usage. Left: Integration of LASP with FSDP backend; Right: Integration of LASP with DDP backend. The TNL-1B model is used, with a batch size of 1 across up to 128 A100 80GB GPUs. The sign "x" with a dotted line represents occurring an Out of Memory (OOM).
 
 ### Difference Results on 4 A100 GPUs
 Following is the difference results obtained by running `tests/script.sh` on 4 A100 GPUs, i.e., run:
@@ -217,7 +247,8 @@ dv diff: mean value: 0.033935546875
 
 ## Todo
 - [x] Diff test
-- [ ] Speed test
+- [x] Convergence results
+- [x] Speed results
 
 
 ## Citation
